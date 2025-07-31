@@ -1,69 +1,128 @@
-# React + TypeScript + Vite
+# 激素-情绪调节模拟器
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一个基于React + TypeScript + Vite构建的交互式激素情绪调节模拟器，通过模拟不同激素对情绪的影响，帮助用户理解人体激素系统与情绪状态的关系。
 
-Currently, two official plugins are available:
+## 🎯 项目特色
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 核心功能
+- **实时激素模拟**：7种关键激素（肾上腺素、皮质醇、GABA、多巴胺、血清素、睾酮、催产素）的动态调节
+- **VAD情绪模型**：基于Arousal（唤醒度）、Valence（效价）、Dominance（支配力）的三维情绪评估
+- **可视化图表**：实时雷达图和历史趋势图展示情绪变化
+- **双语支持**：中英文激素名称切换，满足不同用户需求
+- **响应式设计**：适配桌面和移动设备
 
-## Expanding the ESLint configuration
+### 技术亮点
+- **TypeScript**：完整的类型安全保证
+- **React Hooks**：现代化的状态管理和性能优化
+- **Recharts**：专业的数据可视化图表库
+- **Tailwind CSS**：原子化CSS框架，快速样式开发
+- **Shadcn/ui**：美观且可访问的组件库
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 快速开始
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### 环境要求
+- Node.js 18.0 或更高版本
+- npm / pnpm / yarn 包管理器
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### 安装和运行
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# 克隆项目
+git clone [项目地址]
+cd hormone-vad-demo
+
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 构建生产版本
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 访问应用
+开发服务器启动后，在浏览器中访问：http://localhost:5173
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📊 功能详解
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 激素系统
+- **肾上腺素**：提升唤醒度和支配力，模拟应激反应
+- **皮质醇**：提升唤醒度但降低效价，模拟压力状态
+- **GABA**：降低唤醒度，稳定情绪，模拟镇静效果
+- **多巴胺**：全面提升情绪因子，模拟愉悦和奖励机制
+- **血清素**：提升效价和幸福感，模拟抗抑郁效果
+- **睾酮**：提升支配力和攻击性，模拟雄性特征
+- **催产素**：提升亲和力和信任，模拟社交连接
+
+### 交互功能
+- **实时调节**：通过滑块调节每种激素的注入剂量和衰减率
+- **一键注入**：快速增加特定激素水平
+- **模拟控制**：开始/暂停/重置模拟过程
+- **参数显示**：实时显示当前激素水平
+- **历史追踪**：记录并可视化情绪变化历史
+
+### 情绪状态
+基于VAD模型实时计算并显示当前情绪状态：
+- 兴奋、满足、焦虑、抑郁、愉悦、愤怒、平静等
+
+## 🏗️ 项目结构
+
 ```
+src/
+├── components/          # React组件
+│   ├── HormoneEmotionSimulator.tsx  # 主模拟器组件
+│   └── ui/              # UI组件库
+├── constants/           # 常量定义
+│   ├── hormone.ts       # 激素配置和初始值
+│   └── translations.ts  # 中英文翻译
+├── types/               # TypeScript类型定义
+│   └── hormone.ts       # 激素和情绪相关类型
+├── hooks/               # 自定义React Hooks
+├── lib/                 # 工具函数
+└── assets/              # 静态资源
+```
+
+## 🎨 界面设计
+
+### 响应式布局
+- **桌面端**：四列参数设置，完整图表展示
+- **平板端**：两列参数设置，适配中等屏幕
+- **手机端**：单列布局，触控友好的操作体验
+
+### 视觉风格
+- **色彩编码**：每种激素使用独特的颜色标识
+- **数据可视化**：清晰直观的图表展示
+- **交互反馈**：即时的状态更新和视觉反馈
+
+## 🔧 技术栈
+
+- **前端框架**：React 18 + TypeScript 5
+- **构建工具**：Vite 5
+- **样式方案**：Tailwind CSS + Shadcn/ui
+- **图表库**：Recharts
+- **图标库**：Lucide React
+- **开发工具**：ESLint + TypeScript严格模式
+
+## 📈 开发计划
+
+- [ ] 添加更多激素类型
+- [ ] 实现情绪预测算法
+- [ ] 增加数据导出功能
+- [ ] 添加场景预设模式
+- [ ] 实现多用户会话
+- [ ] 添加声音反馈
+
+## 🤝 贡献指南
+
+欢迎提交Issue和Pull Request来改进这个项目！
+
+## 📄 许可证
+
+MIT License - 详见 [LICENSE](LICENSE) 文件
+
+## 🙏 致谢
+
+- 基于VAD情绪模型的学术研究
+- Shadcn/ui组件库的精美设计
+- Recharts团队的数据可视化支持

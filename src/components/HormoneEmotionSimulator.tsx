@@ -14,6 +14,8 @@ import {
   hormoneColors, 
   initialHormones 
 } from '@/constants/hormone';
+import { Languages } from 'lucide-react';
+import { HORMONE_TRANSLATIONS, type Language } from '@/constants/translations';
 
 
 
@@ -35,6 +37,8 @@ const HormoneEmotionSimulator = () => {
   
   // 历史数据
   const [history, setHistory] = useState<HistoryData[]>([]);
+  
+
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -247,9 +251,30 @@ const HormoneEmotionSimulator = () => {
     { subject: 'Dominance', value: currentVAD.dominance }
   ], [currentVAD]);
 
+  // 添加语言状态
+  const [language, setLanguage] = useState<Language>('zh');
+
+  // 翻译函数
+  const t = (hormoneKey: keyof typeof HORMONE_TRANSLATIONS) => {
+    return HORMONE_TRANSLATIONS[hormoneKey][language];
+  };
+
+  // 切换语言
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'zh' ? 'en' : 'zh');
+  };
+
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
-      <Card className="mb-6">
+    <div className="w-full max-w-7xl mx-auto p-6 min-h-screen">
+      <div className="space-y-6">
+        {/* 标题 */}
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">激素情绪模拟器</h1>
+          <p className="text-muted-foreground">
+            基于VAD情感模型，模拟不同激素对情绪的影响
+          </p>
+        </div>
+        <Card className="mb-6">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold text-gray-800">激素-情绪调节模拟器</CardTitle>
@@ -265,6 +290,10 @@ const HormoneEmotionSimulator = () => {
               <Button variant="outline" onClick={() => setShowSettings(!showSettings)}>
                 <Settings size={16} className="mr-2" />
                 设置
+              </Button>
+              <Button variant="outline" onClick={toggleLanguage}>
+                <Languages size={16} className="mr-2" />
+                {language === 'zh' ? 'EN' : '中文'}
               </Button>
             </div>
           </div>
@@ -316,7 +345,7 @@ const HormoneEmotionSimulator = () => {
                     className="text-xs"
                     style={{ backgroundColor: hormoneColors[hormone] }}
                   >
-                    {hormone}
+                    {t(hormone as keyof typeof HORMONE_TRANSLATIONS)}
                   </Button>
                 ))}
               </div>
@@ -330,15 +359,29 @@ const HormoneEmotionSimulator = () => {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-xl font-semibold">激素参数设置</CardTitle>
+            <p className='text-sm text-gray-500'>
+              Force: 注入时的剂量  |  Decay: 衰减速率(越小衰减越快) |  Current: 当前激素水平
+            </p>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {HORMONE_KEYS.map(hormone => {
               const params = hormones[hormone];
               return (
                 <Card key={hormone} className="p-3">
-                  <h3 className="font-semibold mb-2" style={{ color: hormoneColors[hormone] }}>
-                    {hormone}
-                  </h3>
+                  <div className="mb-0">
+                    <h3 className="font-semibold" style={{ color: hormoneColors[hormone] }}>
+                      {t(hormone as keyof typeof HORMONE_TRANSLATIONS)}
+                    </h3>
+                    <p className="text-xs text-gray-500 leading-tight mt-1">
+                      {hormone === 'adrenaline' && (language === 'zh' ? '提升唤醒度和支配力' : 'Increases arousal and dominance')}
+                      {hormone === 'cortisol' && (language === 'zh' ? '提升唤醒度，降低效价' : 'Increases arousal, decreases valence')}
+                      {hormone === 'gaba' && (language === 'zh' ? '降低唤醒度，稳定情绪' : 'Decreases arousal, stabilizes mood')}
+                      {hormone === 'dopamine' && (language === 'zh' ? '提升所有情绪因子' : 'Increases all emotional factors')}
+                      {hormone === 'serotonin' && (language === 'zh' ? '提升效价和幸福感' : 'Increases valence and well-being')}
+                      {hormone === 'testosterone' && (language === 'zh' ? '提升支配力和攻击性' : 'Increases dominance and assertiveness')}
+                      {hormone === 'oxytocin' && (language === 'zh' ? '提升亲和力和信任' : 'Increases affiliation and trust')}
+                    </p>
+                  </div>
                   <div className="space-y-2">
                     <div>
                       <Label className="text-xs text-gray-600">Force: {params.force}</Label>
@@ -381,15 +424,37 @@ const HormoneEmotionSimulator = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={history}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="arousal" stroke="#ef4444" name="Arousal" strokeWidth={2} />
-                <Line type="monotone" dataKey="valence" stroke="#22c55e" name="Valence" strokeWidth={2} />
-                <Line type="monotone" dataKey="dominance" stroke="#3b82f6" name="Dominance" strokeWidth={2} />
+              <LineChart data={history} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="time" 
+                  stroke="#6b7280"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis 
+                  domain={[0, 100]} 
+                  stroke="#6b7280"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '10px' }}
+                  iconType="line"
+                />
+                <Line type="monotone" dataKey="arousal" stroke="#ef4444" name="Arousal" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                <Line type="monotone" dataKey="valence" stroke="#22c55e" name="Valence" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                <Line type="monotone" dataKey="dominance" stroke="#3b82f6" name="Dominance" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -402,20 +467,44 @@ const HormoneEmotionSimulator = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={history}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Legend />
+              <LineChart data={history} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="time" 
+                  stroke="#6b7280"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis 
+                  domain={[0, 100]} 
+                  stroke="#6b7280"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '10px' }}
+                  iconType="line"
+                />
                 {HORMONE_KEYS.map(hormone => (
                   <Line 
                     key={hormone}
                     type="monotone" 
                     dataKey={hormone} 
                     stroke={hormoneColors[hormone]} 
-                    name={hormone}
-                    strokeWidth={1}
+                    name={t(hormone as keyof typeof HORMONE_TRANSLATIONS)}
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 4 }}
                   />
                 ))}
               </LineChart>
@@ -423,32 +512,8 @@ const HormoneEmotionSimulator = () => {
           </CardContent>
         </Card>
       </div>
-      
-      {/* 使用说明 */}
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">使用说明</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div>
-            <h3 className="font-semibold mb-2">激素功能</h3>
-            <ul className="space-y-1">
-              <li><span style={{color: hormoneColors.adrenaline}}>肾上腺素</span>: 提升Arousal和Dominance</li>
-              <li><span style={{color: hormoneColors.cortisol}}>皮质醇</span>: 提升Arousal，降低Valence</li>
-              <li><span style={{color: hormoneColors.gaba}}>GABA</span>: 降低Arousal，稳定系统</li>
-              <li><span style={{color: hormoneColors.dopamine}}>多巴胺</span>: 提升所有三个因子</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-2">参数说明</h3>
-            <ul className="space-y-1">
-              <li><strong>Force</strong>: 激素注入时的剂量</li>
-              <li><strong>Decay</strong>: 激素衰减速率(越小衰减越快)</li>
-              <li><strong>Current</strong>: 当前激素水平</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
+
+      </div>
     </div>
   );
 };
