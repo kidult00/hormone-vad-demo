@@ -1,71 +1,21 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
 import { Play, Pause, RotateCcw, Settings } from 'lucide-react';
 
-// UI 组件
-import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { Slider } from './ui/slider';
-import { Label } from './ui/label';
+import type { HormoneKey, Hormone, Hormones, VAD, HistoryData } from '@/types/hormone';
+import { 
+  MAX_HISTORY, 
+  UPDATE_INTERVAL, 
+  HORMONE_KEYS, 
+  hormoneColors, 
+  initialHormones 
+} from '@/constants/hormone';
 
 
-type HormoneKey = 'adrenaline' | 'cortisol' | 'gaba' | 'dopamine' | 'serotonin' | 'testosterone' | 'oxytocin';
-
-interface Hormone {
-  force: number;
-  decay: number;
-  current: number;
-}
-
-type Hormones = Record<HormoneKey, Hormone>;
-
-interface VAD {
-  arousal: number;
-  valence: number;
-  dominance: number;
-}
-
-// 类型定义
-interface HistoryData {
-  time: number;
-  arousal: number;
-  valence: number;
-  dominance: number;
-  emotion: string;
-  adrenaline: number;
-  cortisol: number;
-  gaba: number;
-  dopamine: number;
-  serotonin: number;
-  testosterone: number;
-  oxytocin: number;
-}
-
-// 将所有常量移到组件外部
-const MAX_HISTORY = 200;
-const UPDATE_INTERVAL = 100;
-
-const HORMONE_KEYS: HormoneKey[] = ['adrenaline', 'cortisol', 'gaba', 'dopamine', 'serotonin', 'testosterone', 'oxytocin'];
-
-const hormoneColors: Record<HormoneKey, string> = {
-  adrenaline: '#ef4444',
-  cortisol: '#f97316',
-  gaba: '#22c55e',
-  dopamine: '#3b82f6',
-  serotonin: '#ec4899',
-  testosterone: '#eab308',
-  oxytocin: '#06b6d4'
-};
-
-const initialHormones: Hormones = {
-  adrenaline: { force: 50, decay: 0.95, current: 50 },
-  cortisol: { force: 30, decay: 0.98, current: 30 },
-  gaba: { force: 70, decay: 0.92, current: 70 },
-  dopamine: { force: 60, decay: 0.94, current: 60 },
-  serotonin: { force: 65, decay: 0.96, current: 65 },
-  testosterone: { force: 40, decay: 0.99, current: 40 },
-  oxytocin: { force: 55, decay: 0.97, current: 55 }
-};
 
 const HormoneEmotionSimulator = () => {
   // 激素参数状态
@@ -123,49 +73,52 @@ const HormoneEmotionSimulator = () => {
   }, []);
 
   // 模拟步骤 - 使用useCallback优化
-  // 修复模拟步骤函数，确保状态更新的一致性
+  // 优化simulateStep函数，减少状态更新次数
   const simulateStep = useCallback(() => {
     setHormones(prevHormones => {
-      // 计算新的激素水平
-      const nextHormones = { ...prevHormones };
+      const newHormones = { ...prevHormones };
       
-      HORMONE_KEYS.forEach(hormone => {
-        const params = nextHormones[hormone];
-        const decayed = params.current * params.decay;
-        nextHormones[hormone] = {
-          ...params,
-          current: Math.max(0, decayed)
+      // 批量更新所有激素
+      Object.keys(newHormones).forEach(key => {
+        const hormoneKey = key as HormoneKey;
+        const hormone = newHormones[hormoneKey];
+        const decayedValue = hormone.current * hormone.decay;
+        newHormones[hormoneKey] = {
+          ...hormone,
+          current: Math.max(0, Math.min(100, decayedValue))
         };
       });
       
-      return nextHormones;
-    });
-  }, []);
-  
-  // 使用单独的useEffect监听激素变化来更新历史
-  useEffect(() => {
-    if (isRunning || history.length === 0) {
-      const nextVAD = calculateVAD(hormones);
+      // 计算新的VAD值
+      const newVAD = calculateVAD(newHormones);
+      
+      // 一次性更新历史和激素状态
       setHistory(prevHistory => {
-        const nextTime = prevHistory.length > 0 ? prevHistory[prevHistory.length - 1].time + 1 : 0;
+        const lastTime = prevHistory.length > 0 ? prevHistory[prevHistory.length - 1].time : 0;
         const newData: HistoryData = {
-          time: nextTime,
-          ...nextVAD,
-          emotion: getEmotionState(nextVAD),
-          adrenaline: hormones.adrenaline.current,
-          cortisol: hormones.cortisol.current,
-          gaba: hormones.gaba.current,
-          dopamine: hormones.dopamine.current,
-          serotonin: hormones.serotonin.current,
-          testosterone: hormones.testosterone.current,
-          oxytocin: hormones.oxytocin.current
+          time: lastTime + 1,
+          ...newVAD,
+          emotion: getEmotionState(newVAD),
+          adrenaline: newHormones.adrenaline.current,
+          cortisol: newHormones.cortisol.current,
+          gaba: newHormones.gaba.current,
+          dopamine: newHormones.dopamine.current,
+          serotonin: newHormones.serotonin.current,
+          testosterone: newHormones.testosterone.current,
+          oxytocin: newHormones.oxytocin.current
         };
         
-        const updatedHistory = [...prevHistory, newData];
-        return updatedHistory.slice(-MAX_HISTORY);
+        // 使用更高效的方式限制历史长度
+        const newHistory = prevHistory.length >= MAX_HISTORY 
+          ? [...prevHistory.slice(1), newData]
+          : [...prevHistory, newData];
+          
+        return newHistory;
       });
-    }
-  }, [hormones, isRunning, calculateVAD, getEmotionState]);
+      
+      return newHormones;
+    });
+  }, [calculateVAD, getEmotionState]);
 
   // 初始化历史数据
   useEffect(() => {
@@ -230,7 +183,7 @@ const HormoneEmotionSimulator = () => {
   }, [calculateVAD, getEmotionState]);
 
   // 激素注入 - 使用useCallback优化
-  // 优化激素注入函数，注入后立即触发一次模拟步骤
+  // 优化激素注入函数，无论是否运行都更新历史
   const injectHormone = useCallback((hormone: HormoneKey) => {
     setHormones(prev => {
       const newHormones = {
@@ -241,35 +194,36 @@ const HormoneEmotionSimulator = () => {
         }
       };
       
-      // 如果正在运行，立即计算新的VAD值并更新历史
-      if (isRunning) {
-        const nextVAD = calculateVAD(newHormones);
-        setHistory(prevHistory => {
-          const nextTime = prevHistory.length > 0 ? prevHistory[prevHistory.length - 1].time + 1 : 0;
-          const newData: HistoryData = {
-            time: nextTime,
-            ...nextVAD,
-            emotion: getEmotionState(nextVAD),
-            adrenaline: newHormones.adrenaline.current,
-            cortisol: newHormones.cortisol.current,
-            gaba: newHormones.gaba.current,
-            dopamine: newHormones.dopamine.current,
-            serotonin: newHormones.serotonin.current,
-            testosterone: newHormones.testosterone.current,
-            oxytocin: newHormones.oxytocin.current
-          };
+      // 无论是否运行，都立即计算新的VAD值并更新历史
+      const nextVAD = calculateVAD(newHormones);
+      setHistory(prevHistory => {
+        const nextTime = prevHistory.length > 0 ? prevHistory[prevHistory.length - 1].time + 1 : 0;
+        const newData: HistoryData = {
+          time: nextTime,
+          ...nextVAD,
+          emotion: getEmotionState(nextVAD),
+          adrenaline: newHormones.adrenaline.current,
+          cortisol: newHormones.cortisol.current,
+          gaba: newHormones.gaba.current,
+          dopamine: newHormones.dopamine.current,
+          serotonin: newHormones.serotonin.current,
+          testosterone: newHormones.testosterone.current,
+          oxytocin: newHormones.oxytocin.current
+        };
+        
+        const updatedHistory = prevHistory.length >= MAX_HISTORY 
+          ? [...prevHistory.slice(1), newData]
+          : [...prevHistory, newData];
           
-          const updatedHistory = [...prevHistory, newData];
-          return updatedHistory.slice(-MAX_HISTORY);
-        });
-      }
+        return updatedHistory;
+      });
       
       return newHormones;
     });
-  }, [isRunning, calculateVAD, getEmotionState]);
+  }, [calculateVAD, getEmotionState]);
 
   // 更新激素参数 - 使用useCallback优化
-  // 优化激素参数更新函数，使用防抖来减少不必要的重新渲染
+  // 添加防抖钩子用于参数更新
   const updateHormone = useCallback((hormone: HormoneKey, param: keyof Hormone, value: string) => {
     const numValue = parseFloat(value);
     if (isNaN(numValue)) return;
@@ -283,14 +237,15 @@ const HormoneEmotionSimulator = () => {
     }));
   }, []);
 
-  const currentVAD = calculateVAD(hormones);
-  const currentEmotion = getEmotionState(currentVAD);
+  // 在状态定义后添加缓存计算
+  const currentVAD = useMemo(() => calculateVAD(hormones), [hormones, calculateVAD]);
+  const currentEmotion = useMemo(() => getEmotionState(currentVAD), [currentVAD, getEmotionState]);
   
-  const radarData = [
+  const radarData = useMemo(() => [
     { subject: 'Arousal', value: currentVAD.arousal },
     { subject: 'Valence', value: currentVAD.valence },
     { subject: 'Dominance', value: currentVAD.dominance }
-  ];
+  ], [currentVAD]);
 
   return (
     <div className="w-full max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
@@ -426,7 +381,7 @@ const HormoneEmotionSimulator = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={history} key={`vad-chart-${history.length}`}>
+              <LineChart data={history}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="time" />
                 <YAxis domain={[0, 100]} />
@@ -447,7 +402,7 @@ const HormoneEmotionSimulator = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={history} key={`hormone-chart-${history.length}`}>
+              <LineChart data={history}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="time" />
                 <YAxis domain={[0, 100]} />
