@@ -423,7 +423,13 @@ const HormoneEmotionSimulator = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={history} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+              <LineChart 
+                data={history} 
+                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                isAnimationActive={true}
+                animationDuration={300}
+                animationEasing="linear"
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis 
                   dataKey="time" 
@@ -431,6 +437,8 @@ const HormoneEmotionSimulator = () => {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
+                  type="number"
+                  domain={['dataMin', 'dataMax']}
                 />
                 <YAxis 
                   domain={[0, 100]} 
@@ -452,9 +460,39 @@ const HormoneEmotionSimulator = () => {
                   fontSize={10}
                   iconType="line"
                 />
-                <Line type="monotone" dataKey="arousal" stroke="#ef4444" name="Arousal" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                <Line type="monotone" dataKey="valence" stroke="#22c55e" name="Valence" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                <Line type="monotone" dataKey="dominance" stroke="#3b82f6" name="Dominance" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                <Line 
+                  type="monotone" 
+                  dataKey="arousal" 
+                  stroke="#ef4444" 
+                  name="Arousal" 
+                  strokeWidth={2} 
+                  dot={false} 
+                  activeDot={{ r: 4 }}
+                  animationDuration={300}
+                  animationEasing="linear"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="valence" 
+                  stroke="#22c55e" 
+                  name="Valence" 
+                  strokeWidth={2} 
+                  dot={false} 
+                  activeDot={{ r: 4 }}
+                  animationDuration={300}
+                  animationEasing="linear"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="dominance" 
+                  stroke="#3b82f6" 
+                  name="Dominance" 
+                  strokeWidth={2} 
+                  dot={false} 
+                  activeDot={{ r: 4 }}
+                  animationDuration={300}
+                  animationEasing="linear"
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -467,7 +505,13 @@ const HormoneEmotionSimulator = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={history} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+              <LineChart 
+                data={history} 
+                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                isAnimationActive={true}
+                animationDuration={300}
+                animationEasing="linear"
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis 
                   dataKey="time" 
@@ -475,6 +519,8 @@ const HormoneEmotionSimulator = () => {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
+                  type="number"
+                  domain={['dataMin', 'dataMax']}
                 />
                 <YAxis 
                   domain={[0, 100]} 
@@ -505,6 +551,8 @@ const HormoneEmotionSimulator = () => {
                     strokeWidth={2}
                     dot={false}
                     activeDot={{ r: 4 }}
+                    animationDuration={300}
+                    animationEasing="linear"
                   />
                 ))}
               </LineChart>
