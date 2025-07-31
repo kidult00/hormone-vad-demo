@@ -269,151 +269,151 @@ const HormoneEmotionSimulator = () => {
       <div className="space-y-6">
         {/* 标题 */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">激素情绪模拟器</h1>
+          <h1 className="text-3xl font-bold tracking-tight">激素-情绪调节模拟器</h1>
           <p className="text-muted-foreground">
             基于VAD情感模型，模拟不同激素对情绪的影响
           </p>
         </div>
         <Card className="mb-6">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl font-bold text-gray-800">激素-情绪调节模拟器</CardTitle>
-            <div className="flex gap-2">
-              <Button onClick={() => setIsRunning(!isRunning)}>
-                {isRunning ? <Pause size={16} className="mr-2" /> : <Play size={16} className="mr-2" />}
-                {isRunning ? '暂停' : '开始'}
-              </Button>
-              <Button variant="outline" onClick={resetSimulation}>
-                <RotateCcw size={16} className="mr-2" />
-                重置
-              </Button>
-              <Button variant="outline" onClick={() => setShowSettings(!showSettings)}>
-                <Settings size={16} className="mr-2" />
-                设置
-              </Button>
-              <Button variant="outline" onClick={toggleLanguage}>
-                <Languages size={16} className="mr-2" />
-                {language === 'zh' ? 'EN' : '中文'}
-              </Button>
+         
+          <CardContent>
+            <div className="grid grid-cols-1  gap-6">
+              {/* 左侧 - 激素注入 */}
+              <div>
+              <h3 className="font-semibold text-lg mb-2">激素参数设置与注入</h3>
+              <p className='text-sm text-gray-500 mb-4'>
+                Force: 注入时的剂量  |  Decay: 衰减速率(越小衰减越快) |  Current: 当前激素水平
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
+                {HORMONE_KEYS.map(hormone => {
+                  const params = hormones[hormone];
+                  return (
+                    <Card key={hormone} className="p-4 relative">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-semibold text-sm" style={{ color: hormoneColors[hormone] }}>
+                            {t(hormone as keyof typeof HORMONE_TRANSLATIONS)}
+                          </h4>
+                          <p className="text-xs text-gray-500 leading-tight mt-1">
+                            {hormone === 'adrenaline' && (language === 'zh' ? '提升唤醒度和支配力' : 'Increases arousal and dominance')}
+                            {hormone === 'cortisol' && (language === 'zh' ? '提升唤醒度，降低效价' : 'Increases arousal, decreases valence')}
+                            {hormone === 'gaba' && (language === 'zh' ? '降低唤醒度，稳定情绪' : 'Decreases arousal, stabilizes mood')}
+                            {hormone === 'dopamine' && (language === 'zh' ? '提升所有情绪因子' : 'Increases all emotional factors')}
+                            {hormone === 'serotonin' && (language === 'zh' ? '提升效价和幸福感' : 'Increases valence and well-being')}
+                            {hormone === 'testosterone' && (language === 'zh' ? '提升支配力和攻击性' : 'Increases dominance and assertiveness')}
+                            {hormone === 'oxytocin' && (language === 'zh' ? '提升亲和力和信任' : 'Increases affiliation and trust')}
+                          </p>
+                        </div>
+                        <Button
+                          onClick={() => injectHormone(hormone)}
+                          className="text-xs px-3 py-1 h-auto"
+                          style={{ backgroundColor: hormoneColors[hormone] }}
+                          title={`注入 ${t(hormone as keyof typeof HORMONE_TRANSLATIONS)}`}
+                        >
+                          注入
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        <div>
+                          <Label className="text-xs text-gray-600">Force: {params.force}</Label>
+                          <Slider
+                            min={0}
+                            max={100}
+                            value={[params.force]}
+                            onValueChange={(value) => updateHormone(hormone, 'force', String(value[0]))}
+                            className="w-full"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">Decay: {params.decay.toFixed(3)}</Label>
+                          <Slider
+                            min={0.8}
+                            max={0.99}
+                            step={0.01}
+                            value={[params.decay]}
+                            onValueChange={(value) => updateHormone(hormone, 'decay', String(value[0]))}
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Current: {params.current.toFixed(1)}
+                        </div>
+                        
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+              
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* 运行按钮 */}
+              <div className="flex gap-2">
+                <Button onClick={() => setIsRunning(!isRunning)}>
+                  {isRunning ? <Pause size={16} className="mr-2" /> : <Play size={16} className="mr-2" />}
+                  {isRunning ? '暂停' : '开始'}
+                </Button>
+                <Button variant="outline" onClick={resetSimulation}>
+                  <RotateCcw size={16} className="mr-2" />
+                  重置
+                </Button>
+                <Button variant="outline" onClick={toggleLanguage}>
+                  <Languages size={16} className="mr-2" />
+                  {language === 'zh' ? 'EN' : '中文'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 当前状态和VAD因子 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* 当前状态 */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-semibold">当前状态</CardTitle>
+              <CardTitle className="text-xl font-semibold">当前状态</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-600 mb-2">{currentEmotion}</div>
-              <div className="space-y-1 text-sm">
-                <div>Arousal: <span className="font-semibold">{currentVAD.arousal.toFixed(1)}</span></div>
-                <div>Valence: <span className="font-semibold">{currentVAD.valence.toFixed(1)}</span></div>
-                <div>Dominance: <span className="font-semibold">{currentVAD.dominance.toFixed(1)}</span></div>
+              <div className="text-3xl font-bold text-blue-600 mb-4">{currentEmotion}</div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Arousal:</span>
+                  <span className="font-semibold">{currentVAD.arousal.toFixed(1)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Valence:</span>
+                  <span className="font-semibold">{currentVAD.valence.toFixed(1)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Dominance:</span>
+                  <span className="font-semibold">{currentVAD.dominance.toFixed(1)}</span>
+                </div>
               </div>
             </CardContent>
           </Card>
-          
-          {/* VAD雷达图 */}
+
+          {/* VAD因子雷达图 */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-semibold">VAD因子</CardTitle>
+              <CardTitle className="text-xl font-semibold">VAD因子</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={200}>
-                <RadarChart data={radarData}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="subject" />
-                  <PolarRadiusAxis domain={[0, 100]} />
-                  <Radar dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+              <ResponsiveContainer width="100%" height={250}>
+                <RadarChart data={radarData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                  <PolarGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
+                  <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
+                  <Radar 
+                    dataKey="value" 
+                    stroke="#3b82f6" 
+                    fill="#3b82f6" 
+                    fillOpacity={0.3}
+                    strokeWidth={2}
+                  />
                 </RadarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
-          
-          {/* 激素注入 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">激素注入</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-2">
-                {HORMONE_KEYS.map(hormone => (
-                  <Button
-                    key={hormone}
-                    onClick={() => injectHormone(hormone)}
-                    className="text-xs"
-                    style={{ backgroundColor: hormoneColors[hormone] }}
-                  >
-                    {t(hormone as keyof typeof HORMONE_TRANSLATIONS)}
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </CardContent>
-      </Card>
-
-      {/* 参数设置 */}
-      {showSettings && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">激素参数设置</CardTitle>
-            <p className='text-sm text-gray-500'>
-              Force: 注入时的剂量  |  Decay: 衰减速率(越小衰减越快) |  Current: 当前激素水平
-            </p>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {HORMONE_KEYS.map(hormone => {
-              const params = hormones[hormone];
-              return (
-                <Card key={hormone} className="p-3">
-                  <div className="mb-0">
-                    <h3 className="font-semibold" style={{ color: hormoneColors[hormone] }}>
-                      {t(hormone as keyof typeof HORMONE_TRANSLATIONS)}
-                    </h3>
-                    <p className="text-xs text-gray-500 leading-tight mt-1">
-                      {hormone === 'adrenaline' && (language === 'zh' ? '提升唤醒度和支配力' : 'Increases arousal and dominance')}
-                      {hormone === 'cortisol' && (language === 'zh' ? '提升唤醒度，降低效价' : 'Increases arousal, decreases valence')}
-                      {hormone === 'gaba' && (language === 'zh' ? '降低唤醒度，稳定情绪' : 'Decreases arousal, stabilizes mood')}
-                      {hormone === 'dopamine' && (language === 'zh' ? '提升所有情绪因子' : 'Increases all emotional factors')}
-                      {hormone === 'serotonin' && (language === 'zh' ? '提升效价和幸福感' : 'Increases valence and well-being')}
-                      {hormone === 'testosterone' && (language === 'zh' ? '提升支配力和攻击性' : 'Increases dominance and assertiveness')}
-                      {hormone === 'oxytocin' && (language === 'zh' ? '提升亲和力和信任' : 'Increases affiliation and trust')}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <div>
-                      <Label className="text-xs text-gray-600">Force: {params.force}</Label>
-                      <Slider
-                        min={0}
-                        max={100}
-                        value={[params.force]}
-                        onValueChange={(value) => updateHormone(hormone, 'force', String(value[0]))}
-                        className="w-full"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs text-gray-600">Decay: {params.decay.toFixed(3)}</Label>
-                      <Slider
-                        min={0.8}
-                        max={0.99}
-                        step={0.01}
-                        value={[params.decay]}
-                        onValueChange={(value) => updateHormone(hormone, 'decay', String(value[0]))}
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Current: {params.current.toFixed(1)}
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </CardContent>
-        </Card>
-      )}
+        </div>
 
       {/* 历史图表 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -450,6 +450,7 @@ const HormoneEmotionSimulator = () => {
                 />
                 <Legend 
                   wrapperStyle={{ paddingTop: '10px' }}
+                  fontSize={10}
                   iconType="line"
                 />
                 <Line type="monotone" dataKey="arousal" stroke="#ef4444" name="Arousal" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
