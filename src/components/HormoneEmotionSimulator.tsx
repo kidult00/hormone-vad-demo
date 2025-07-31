@@ -288,20 +288,21 @@ const HormoneEmotionSimulator = () => {
                 {HORMONE_KEYS.map(hormone => {
                   const params = hormones[hormone];
                   return (
-                    <Card key={hormone} className="p-4 relative">
-                      <div className="flex justify-between items-start mb-2">
+                    <Card key={hormone} className="p-4 gap-4 relative">
+                      {/* 激素名称 */}
+                      <div className="flex justify-between items-start mb-0">
                         <div>
                           <h4 className="font-semibold text-sm" style={{ color: hormoneColors[hormone] }}>
                             {t(hormone as keyof typeof HORMONE_TRANSLATIONS)}
                           </h4>
                           <p className="text-xs text-gray-500 leading-tight mt-1">
-                            {hormone === 'adrenaline' && (language === 'zh' ? '提升唤醒度和支配力' : 'Increases arousal and dominance')}
-                            {hormone === 'cortisol' && (language === 'zh' ? '提升唤醒度，降低效价' : 'Increases arousal, decreases valence')}
-                            {hormone === 'gaba' && (language === 'zh' ? '降低唤醒度，稳定情绪' : 'Decreases arousal, stabilizes mood')}
-                            {hormone === 'dopamine' && (language === 'zh' ? '提升所有情绪因子' : 'Increases all emotional factors')}
-                            {hormone === 'serotonin' && (language === 'zh' ? '提升效价和幸福感' : 'Increases valence and well-being')}
-                            {hormone === 'testosterone' && (language === 'zh' ? '提升支配力和攻击性' : 'Increases dominance and assertiveness')}
-                            {hormone === 'oxytocin' && (language === 'zh' ? '提升亲和力和信任' : 'Increases affiliation and trust')}
+                            {hormone === 'adrenaline' && '提升唤醒度和支配力'}
+                            {hormone === 'cortisol' && '提升唤醒度，降低效价'}
+                            {hormone === 'gaba' && '降低唤醒度，稳定情绪'}
+                            {hormone === 'dopamine' && '提升所有情绪因子'}
+                            {hormone === 'serotonin' && '提升效价和幸福感'}
+                            {hormone === 'testosterone' && '提升支配力和攻击性'}
+                            {hormone === 'oxytocin' && '提升亲和力和信任'}
                           </p>
                         </div>
                         <Button
@@ -313,6 +314,7 @@ const HormoneEmotionSimulator = () => {
                           注入
                         </Button>
                       </div>
+                      {/* 激素参数 */}
                       <div className="space-y-2">
                         <div>
                           <Label className="text-xs text-gray-600">Force: {params.force}</Label>
