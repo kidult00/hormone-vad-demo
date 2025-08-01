@@ -1,6 +1,5 @@
 import React from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from 'recharts';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { formatRadarData } from '@/utils/hormoneCalculations';
 import type { VAD } from '@/types/hormone';
 

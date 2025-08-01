@@ -43,7 +43,7 @@ export const useHormoneSimulation = () => {
       testosterone: hormonesData.testosterone.current,
       oxytocin: hormonesData.oxytocin.current
     };
-  }, [getEmotionState]);
+  }, []);
 
   /**
    * 单步模拟 - 更新激素衰减并记录历史
@@ -81,7 +81,7 @@ export const useHormoneSimulation = () => {
       
       return newHormones;
     });
-  }, [calculateVAD, createHistoryData]);
+  }, [createHistoryData]);
 
   /**
    * 重置模拟 - 恢复到初始状态
@@ -94,7 +94,7 @@ export const useHormoneSimulation = () => {
     const initialVAD = calculateVAD(initialHormones);
     const initialData = createHistoryData(initialHormones, initialVAD);
     setHistory([initialData]);
-  }, [calculateVAD, createHistoryData]);
+  }, [createHistoryData]);
 
   /**
    * 注入激素 - 立即增加指定激素的当前值
@@ -125,7 +125,7 @@ export const useHormoneSimulation = () => {
       
       return newHormones;
     });
-  }, [calculateVAD, createHistoryData]);
+  }, [createHistoryData]);
 
   /**
    * 更新激素参数 - 修改force或decay值
@@ -149,7 +149,7 @@ export const useHormoneSimulation = () => {
     const initialVAD = calculateVAD(initialHormones);
     const initialData = createHistoryData(initialHormones, initialVAD);
     setHistory([initialData]);
-  }, [calculateVAD, createHistoryData]);
+  }, [createHistoryData]);
 
   // 模拟控制 - 启动/停止定时器
   useEffect(() => {
@@ -171,8 +171,8 @@ export const useHormoneSimulation = () => {
   }, [isRunning, simulateStep]);
 
   // 计算当前VAD和情绪状态
-  const currentVAD = useMemo(() => calculateVAD(hormones), [hormones, calculateVAD]);
-  const currentEmotion = useMemo(() => getEmotionState(currentVAD), [currentVAD, getEmotionState]);
+  const currentVAD = useMemo(() => calculateVAD(hormones), [hormones]);
+  const currentEmotion = useMemo(() => getEmotionState(currentVAD), [currentVAD]);
 
   return {
     // 状态

@@ -5,10 +5,7 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Play, Pause, RotateCcw, Languages } from 'lucide-react';
 
-import { 
-  HORMONE_KEYS, 
-  hormoneColors
-} from '@/constants/hormone';
+import { HORMONE_KEYS, hormoneColors } from '@/constants/hormone';
 import { HORMONE_TRANSLATIONS, type Language } from '@/constants/translations';
 import { useHormoneSimulation } from '@/hooks/useHormoneSimulation';
 import { VADRadarChart, VADHistoryChart, HormoneHistoryChart } from '@/components/charts';
@@ -38,8 +35,6 @@ const HormoneEmotionSimulator = () => {
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'zh' ? 'en' : 'zh');
   };
-
-
 
   return (
     <div className="w-full max-w-7xl mx-auto p-6 min-h-screen">
