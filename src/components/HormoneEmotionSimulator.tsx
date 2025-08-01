@@ -84,7 +84,7 @@ const HormoneEmotionSimulator = () => {
                         </div>
                         <Button
                           onClick={() => injectHormone(hormone)}
-                          className="text-xs px-3 py-1 h-auto"
+                          className="text-xs px-3 py-1 h-auto cursor-pointer"
                           style={{ backgroundColor: hormoneColors[hormone] }}
                           title={`注入 ${t(hormone as keyof typeof HORMONE_TRANSLATIONS)}`}
                         >
@@ -100,7 +100,7 @@ const HormoneEmotionSimulator = () => {
                             max={100}
                             value={[params.force]}
                             onValueChange={(value) => updateHormone(hormone, 'force', value[0])}
-                            className="w-full"
+                            className="w-full cursor-pointer"
                           />
                         </div>
                         <div>
@@ -111,7 +111,7 @@ const HormoneEmotionSimulator = () => {
                             step={0.01}
                             value={[params.decay]}
                             onValueChange={(value) => updateHormone(hormone, 'decay', value[0])}
-                            className="w-full"
+                            className="w-full cursor-pointer"
                           />
                         </div>
                         <div className="text-xs text-gray-500">
@@ -127,15 +127,15 @@ const HormoneEmotionSimulator = () => {
             </div>
               {/* 运行按钮 */}
               <div className="flex gap-2">
-                <Button onClick={() => setIsRunning(!isRunning)}>
+                <Button onClick={() => setIsRunning(!isRunning)} className="cursor-pointer">
                   {isRunning ? <Pause size={16} className="mr-2" /> : <Play size={16} className="mr-2" />}
                   {isRunning ? '暂停' : '开始'}
                 </Button>
-                <Button variant="outline" onClick={resetSimulation}>
+                <Button variant="outline" onClick={resetSimulation} className="cursor-pointer">
                   <RotateCcw size={16} className="mr-2" />
                   重置
                 </Button>
-                <Button variant="outline" onClick={toggleLanguage}>
+                <Button variant="outline" onClick={toggleLanguage} className="cursor-pointer">
                   <Languages size={16} className="mr-2" />
                   {language === 'zh' ? 'EN' : '中文'}
                 </Button>

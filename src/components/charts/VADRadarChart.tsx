@@ -16,19 +16,12 @@ export interface VADRadarChartProps {
  */
 export const VADRadarChart: React.FC<VADRadarChartProps> = ({ 
   vad, 
-  title = "VAD因子雷达图",
+  // title = "VAD因子雷达图",
   height = 250 
 }) => {
   const radarData = formatRadarData(vad);
 
   return (
-    <Card>
-      {title && (
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-        </CardHeader>
-      )}
-      <CardContent>
         <ResponsiveContainer width="100%" height={height}>
           <RadarChart data={radarData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
             <PolarGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -51,7 +44,5 @@ export const VADRadarChart: React.FC<VADRadarChartProps> = ({
             />
           </RadarChart>
         </ResponsiveContainer>
-      </CardContent>
-    </Card>
   );
 };
