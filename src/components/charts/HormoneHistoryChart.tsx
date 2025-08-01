@@ -84,8 +84,8 @@ export const HormoneHistoryChart: React.FC<HormoneHistoryChartProps> = ({
                 strokeWidth={2}
                 dot={false}
                 activeDot={{ r: 4 }}
-                animationDuration={300}
-                animationEasing="linear"
+                animationDuration={0}  // 禁用动画
+                isAnimationActive={false}  // 完全禁用动画
               />
             ))}
           </LineChart>

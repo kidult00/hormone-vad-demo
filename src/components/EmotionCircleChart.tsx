@@ -160,7 +160,7 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions, curre
                 />
                 <text
                   x={mapToSVG(currentVAD.valence, currentVAD.dominance, false).x}
-                  y={mapToSVG(currentVAD.valence, currentVAD.dominance, false).y - dotRadius - 15}
+                  y={mapToSVG(currentVAD.valence, currentVAD.dominance, false).y - dotRadius - 10}
                   textAnchor="middle"
                   fontSize="10"
                   fill="#dc2626"

@@ -98,6 +98,7 @@ export const useHormoneSimulation = () => {
 
   /**
    * 注入激素 - 立即增加指定激素的当前值
+   * 仅在模拟运行时更新历史数据
    */
   const injectHormone = useCallback((hormone: HormoneKey) => {
     setHormones(prev => {
@@ -109,23 +110,25 @@ export const useHormoneSimulation = () => {
         }
       };
       
-      // 计算新的VAD值并更新历史
-      const nextVAD = calculateVAD(newHormones);
-      setHistory(prevHistory => {
-        const nextTime = prevHistory.length > 0 ? prevHistory[prevHistory.length - 1].time + 1 : 0;
-        const newData = createHistoryData(newHormones, nextVAD);
-        newData.time = nextTime;
-        
-        const updatedHistory = prevHistory.length >= MAX_HISTORY 
-          ? [...prevHistory.slice(1), newData]
-          : [...prevHistory, newData];
+      // 仅在模拟运行时更新历史数据
+      if (isRunning) {
+        const nextVAD = calculateVAD(newHormones);
+        setHistory(prevHistory => {
+          const nextTime = prevHistory.length > 0 ? prevHistory[prevHistory.length - 1].time + 1 : 0;
+          const newData = createHistoryData(newHormones, nextVAD);
+          newData.time = nextTime;
           
-        return updatedHistory;
-      });
+          const updatedHistory = prevHistory.length >= MAX_HISTORY 
+            ? [...prevHistory.slice(1), newData]
+            : [...prevHistory, newData];
+            
+          return updatedHistory;
+        });
+      }
       
       return newHormones;
     });
-  }, [createHistoryData]);
+  }, [createHistoryData, isRunning]);
 
   /**
    * 更新激素参数 - 修改force或decay值
