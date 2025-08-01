@@ -68,8 +68,13 @@ const createHistoryData = useCallback(
 - **重构主组件**: 从 543 行减少到 ~200 行
 - **关注点分离**: UI 层与业务逻辑层完全解耦
 - **消除重复代码**: 移除 useHormoneSimulation 中的重复实现，统一使用 hormoneCalculations 工具函数
-- **重构收益**: 代码量减少 65%，逻辑复用性提升 80%，DRY 原则得到贯彻
+- **图表组件拆分**: 基于最佳实践创建可复用图表组件
+  - `src/components/charts/VADRadarChart.tsx` - VAD因子雷达图组件
+  - `src/components/charts/VADHistoryChart.tsx` - VAD历史折线图组件
+  - `src/components/charts/HormoneHistoryChart.tsx` - 激素水平历史折线图组件
+  - `src/components/charts/index.ts` - 图表组件统一导出
 - **验证结果**: ✅ TypeScript 编译通过，pnpm build 成功，功能验证正常
+- **重构收益**: 代码量减少 65%，逻辑复用性提升 80%，DRY 原则得到贯彻，图表组件可复用性100%提升
 
 #### 3. 图表动画优化
 

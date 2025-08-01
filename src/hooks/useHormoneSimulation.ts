@@ -14,7 +14,6 @@ import {
 
 /**
  * 激素-情绪模拟的核心业务逻辑Hook
- * 包含VAD计算、状态管理、模拟控制等核心功能
  * 使用hormoneCalculations中的工具函数避免重复实现
  */
 export const useHormoneSimulation = () => {

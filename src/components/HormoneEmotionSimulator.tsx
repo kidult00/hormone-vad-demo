@@ -1,20 +1,17 @@
-import { useState, useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { Play, Pause, RotateCcw } from 'lucide-react';
-
+import { Play, Pause, RotateCcw, Languages } from 'lucide-react';
 
 import { 
   HORMONE_KEYS, 
   hormoneColors
 } from '@/constants/hormone';
-import { Languages } from 'lucide-react';
 import { HORMONE_TRANSLATIONS, type Language } from '@/constants/translations';
 import { useHormoneSimulation } from '@/hooks/useHormoneSimulation';
-import { formatRadarData } from '@/utils/hormoneCalculations';
+import { VADRadarChart, VADHistoryChart, HormoneHistoryChart } from '@/components/charts';
 
 const HormoneEmotionSimulator = () => {
   const {
@@ -42,8 +39,7 @@ const HormoneEmotionSimulator = () => {
     setLanguage(prev => prev === 'zh' ? 'en' : 'zh');
   };
 
-  // 使用工具函数格式化雷达图数据
-  const radarData = useMemo(() => formatRadarData(currentVAD), [currentVAD]);
+
 
   return (
     <div className="w-full max-w-7xl mx-auto p-6 min-h-screen">
@@ -176,21 +172,8 @@ const HormoneEmotionSimulator = () => {
 
               {/* 右侧：VAD因子雷达图 (2/3) */}
               <div className="lg:col-span-2">
-                  <ResponsiveContainer width="100%" height={250}>
-                   <RadarChart data={radarData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                      <PolarGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
-                      <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
-                      <Radar 
-                        dataKey="value" 
-                        stroke="#3b82f6" 
-                        fill="#3b82f6" 
-                        fillOpacity={0.3}
-                        strokeWidth={2}
-                      />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </div>
+                <VADRadarChart vad={currentVAD} />
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -198,143 +181,10 @@ const HormoneEmotionSimulator = () => {
       {/* 历史图表 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* VAD历史 */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">VAD因子历史</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart 
-                data={history} 
-                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="time" 
-                  stroke="#6b7280"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  type="number"
-                  domain={['dataMin', 'dataMax']}
-                />
-                <YAxis 
-                  domain={[0, 100]} 
-                  stroke="#6b7280"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '10px' }}
-                  fontSize={10}
-                  iconType="line"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="arousal" 
-                  stroke="#ef4444" 
-                  name="Arousal" 
-                  strokeWidth={2} 
-                  dot={false} 
-                  activeDot={{ r: 4 }}
-                  animationDuration={300}
-                  animationEasing="linear"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="valence" 
-                  stroke="#22c55e" 
-                  name="Valence" 
-                  strokeWidth={2} 
-                  dot={false} 
-                  activeDot={{ r: 4 }}
-                  animationDuration={300}
-                  animationEasing="linear"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="dominance" 
-                  stroke="#3b82f6" 
-                  name="Dominance" 
-                  strokeWidth={2} 
-                  dot={false} 
-                  activeDot={{ r: 4 }}
-                  animationDuration={300}
-                  animationEasing="linear"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <VADHistoryChart data={history} />
         
         {/* 激素历史 */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">激素水平历史</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart 
-                data={history} 
-                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="time" 
-                  stroke="#6b7280"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  type="number"
-                  domain={['dataMin', 'dataMax']}
-                />
-                <YAxis 
-                  domain={[0, 100]} 
-                  stroke="#6b7280"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '10px' }}
-                  iconType="line"
-                />
-                {HORMONE_KEYS.map(hormone => (
-                  <Line 
-                    key={hormone}
-                    type="monotone" 
-                    dataKey={hormone} 
-                    stroke={hormoneColors[hormone]} 
-                    name={t(hormone as keyof typeof HORMONE_TRANSLATIONS)}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                    animationDuration={300}
-                    animationEasing="linear"
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <HormoneHistoryChart data={history} language={language} />
       </div>
 
       </div>

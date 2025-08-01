@@ -2,7 +2,7 @@ import type { Hormones, VAD } from '@/types/hormone';
 
 /**
  * 激素计算工具库
- * 提供VAD计算、情绪判断、数值处理等纯函数
+ * 提供VAD计算、情绪判断、数值处理等核心功能
  */
 
 /**
@@ -105,10 +105,15 @@ export const clampHormoneLevel = (level: number): number => {
  * @param vad - VAD因子
  * @returns 雷达图格式数据
  */
+/**
+ * 将VAD值转换为雷达图数据格式
+ * @param vad - VAD三维情绪模型数据
+ * @returns 雷达图所需的数据格式
+ */
 export const formatRadarData = (vad: VAD) => [
-  { subject: 'Arousal', value: Math.round(vad.arousal * 10) / 10 },
-  { subject: 'Valence', value: Math.round(vad.valence * 10) / 10 },
-  { subject: 'Dominance', value: Math.round(vad.dominance * 10) / 10 }
+  { subject: 'Arousal', value: vad.arousal },
+  { subject: 'Valence', value: vad.valence },
+  { subject: 'Dominance', value: vad.dominance },
 ];
 
 /**
