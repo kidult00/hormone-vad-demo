@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -9,8 +9,71 @@ import { HORMONE_KEYS, hormoneColors } from '@/constants/hormone';
 import { HORMONE_TRANSLATIONS, type Language } from '@/constants/translations';
 import { useHormoneSimulation } from '@/hooks/useHormoneSimulation';
 import { VADRadarChart, VADHistoryChart, HormoneHistoryChart } from '@/components/charts';
+import EmotionCircleChart from "./EmotionCircleChart";
+
+interface EmotionVAD {
+  emotion: string;
+  valence: number;
+  dominance: number;
+  arousal: number;
+}
 
 const HormoneEmotionSimulator = () => {
+  const [emotionVADData, setEmotionVADData] = useState<EmotionVAD[]>([]);
+
+  // 动态加载JSON数据
+  const loadEmotionData = async () => {
+    try {
+      const response = await fetch('/data/emotion_vad.json');
+      const data = await response.json();
+      setEmotionVADData(data);
+    } catch (error) {
+      console.error('加载情绪数据失败:', error);
+      // 如果加载失败，使用默认数据
+      setEmotionVADData([
+        { "emotion": "恐惧", "valence": -0.7, "dominance": 0.6, "arousal": 0.8 },
+        { "emotion": "失落", "valence": -0.6, "dominance": 0.4, "arousal": 0.75 },
+        { "emotion": "恨", "valence": -0.85, "dominance": 0.3, "arousal": 0.85 },
+        { "emotion": "敬畏", "valence": -0.1, "dominance": 0.55, "arousal": 0.7 },
+        { "emotion": "相信", "valence": 0.6, "dominance": 0.5, "arousal": 0.7 },
+        { "emotion": "期待", "valence": 0.7, "dominance": 0.7, "arousal": 0.8 },
+        { "emotion": "爱", "valence": 0.9, "dominance": 0.8, "arousal": 0.9 },
+        { "emotion": "幸福", "valence": 0.9, "dominance": 0.6, "arousal": 0.85 },
+        { "emotion": "喜欢", "valence": 0.6, "dominance": 0.3, "arousal": 0.5 },
+        { "emotion": "困惑", "valence": -0.2, "dominance": 0.4, "arousal": 0.55 },
+        { "emotion": "讨厌", "valence": -0.4, "dominance": 0.1, "arousal": 0.4 },
+        { "emotion": "悲伤", "valence": -0.8, "dominance": -0.1, "arousal": 0.4 },
+        { "emotion": "焦虑", "valence": -0.7, "dominance": -0.2, "arousal": 0.5 },
+        { "emotion": "厌恶", "valence": -0.6, "dominance": -0.05, "arousal": 0.45 },
+        { "emotion": "嫉", "valence": -0.5, "dominance": -0.25, "arousal": 0.4 },
+        { "emotion": "怒", "valence": -0.6, "dominance": -0.4, "arousal": 0.35 },
+        { "emotion": "关心", "valence": 0.15, "dominance": -0.5, "arousal": 0.2 },
+        { "emotion": "好奇", "valence": 0.1, "dominance": -0.2, "arousal": 0.3 },
+        { "emotion": "骄傲", "valence": 0.4, "dominance": 0.2, "arousal": 0.4 },
+        { "emotion": "欣喜", "valence": 0.6, "dominance": -0.05, "arousal": 0.5 },
+        { "emotion": "羡", "valence": 0.4, "dominance": -0.5, "arousal": 0.45 },
+        { "emotion": "解脱", "valence": 0.6, "dominance": -0.05, "arousal": 0.55 },
+        { "emotion": "愉快", "valence": 0.5, "dominance": -0.35, "arousal": 0.3 }
+      ]);
+    }
+  };
+
+  // 组件加载时加载数据
+  useEffect(() => {
+    loadEmotionData();
+  }, []);
+
+  // 监听文件变化（开发模式）
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      const interval = setInterval(() => {
+        loadEmotionData();
+      }, 1000); // 每秒检查一次文件变化
+
+      return () => clearInterval(interval);
+    }
+  }, []);
+
   const {
     hormones,
     isRunning,
@@ -173,6 +236,8 @@ const HormoneEmotionSimulator = () => {
           </CardContent>
         </Card>
 
+      
+
       {/* 历史图表 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* VAD历史 */}
@@ -181,7 +246,10 @@ const HormoneEmotionSimulator = () => {
         {/* 激素历史 */}
         <HormoneHistoryChart data={history} language={language} />
       </div>
-
+      {/* 情绪分布图 */}
+      <div className="mb-6">
+        <EmotionCircleChart emotions={emotionVADData} />
+      </div>
       </div>
     </div>
   );
