@@ -117,7 +117,7 @@ const HormoneEmotionSimulator = () => {
               <div>
               <h3 className="font-semibold text-lg mb-2">激素参数设置与注入</h3>
               <p className='text-sm text-gray-500 mb-4'>
-                Force: 注入时的剂量  |  Decay: 衰减速率(越小衰减越快) |  Current: 当前激素水平
+                Force: 注入时的剂量  |  Decay: 衰减时长 |  Current: 当前激素水平
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
                 {HORMONE_KEYS.map(hormone => {
@@ -215,15 +215,15 @@ const HormoneEmotionSimulator = () => {
                 <div className="mb-6">
                   <div className="text-3xl font-bold text-blue-600 mb-4">{currentEmotion}</div>
                   <div className="space-y-3 text-sm">
-                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                    <div className="flex gap-4 items-center p-2 bg-gray-50 rounded">
                       <span className="font-medium">Arousal:</span>
                       <span className="font-semibold text-red-600">{currentVAD.arousal.toFixed(1)}</span>
                     </div>
-                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                    <div className="flex gap-4 items-center p-2 bg-gray-50 rounded">
                       <span className="font-medium">Valence:</span>
                       <span className="font-semibold text-green-600">{currentVAD.valence.toFixed(1)}</span>
                     </div>
-                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                    <div className="flex gap-4 items-center p-2 bg-gray-50 rounded">
                       <span className="font-medium">Dominance:</span>
                       <span className="font-semibold text-blue-600">{currentVAD.dominance.toFixed(1)}</span>
                     </div>
