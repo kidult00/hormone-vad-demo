@@ -10,6 +10,11 @@ interface EmotionVAD {
 
 interface EmotionCircleChartProps {
   emotions: EmotionVAD[];
+  currentVAD?: {
+    valence: number;
+    dominance: number;
+    arousal: number;
+  };
 }
 
 /**
@@ -17,8 +22,9 @@ interface EmotionCircleChartProps {
  * 将情绪数据映射到二维坐标系中
  * X轴：Valence（负-正）
  * Y轴：Dominance（被动-主动）
+ * 显示当前VAD状态为红色圆点
  */
-const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions }) => {
+const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions, currentVAD }) => {
   // SVG 画布尺寸
   const width = 400;
   const height = 400;
@@ -29,12 +35,25 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions }) => 
 
   /**
    * 将VAD坐标映射到SVG坐标
-   * Valence: -1到1 → X轴
-   * Dominance: -1到1 → Y轴（注意Y轴方向：上方为正向）
+   * 情绪数据：valence和dominance为-1到1
+   * currentVAD：valence和dominance为0-100
    */
-  const mapToSVG = (valence: number, dominance: number) => {
-    const x = centerX + valence * radius;
-    const y = centerY - dominance * radius; // 反转Y轴方向
+  const mapToSVG = (valence: number, dominance: number, isEmotionData = true) => {
+    let normalizedValence: number;
+    let normalizedDominance: number;
+    
+    if (isEmotionData) {
+      // 情绪数据：-1到1直接映射
+      normalizedValence = valence;
+      normalizedDominance = dominance;
+    } else {
+      // currentVAD：0-100映射到-1到1
+      normalizedValence = (valence - 50) / 50;
+      normalizedDominance = (dominance - 50) / 50;
+    }
+    
+    const x = centerX + normalizedValence * radius;
+    const y = centerY - normalizedDominance * radius; // 反转Y轴方向
     return { x, y };
   };
 
@@ -101,7 +120,7 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions }) => 
 
             {/* 情绪点 */}
             {emotions.map((emotion, index) => {
-              const { x, y } = mapToSVG(emotion.valence, emotion.dominance);
+              const { x, y } = mapToSVG(emotion.valence, emotion.dominance, true);
               
               return (
                 <g key={index}>
@@ -127,6 +146,30 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions }) => 
                 </g>
               );
             })}
+
+            {/* 当前VAD状态红色圆点 */}
+            {currentVAD && (
+              <g>
+                <circle
+                  cx={mapToSVG(currentVAD.valence, currentVAD.dominance, false).x}
+                  cy={mapToSVG(currentVAD.valence, currentVAD.dominance, false).y}
+                  r={dotRadius + 2}
+                  fill="#ef4444"
+                  stroke="#dc2626"
+                  strokeWidth="1"
+                />
+                <text
+                  x={mapToSVG(currentVAD.valence, currentVAD.dominance, false).x}
+                  y={mapToSVG(currentVAD.valence, currentVAD.dominance, false).y - dotRadius - 15}
+                  textAnchor="middle"
+                  fontSize="10"
+                  fill="#dc2626"
+                  fontWeight="bold"
+                >
+                  当前状态
+                </text>
+              </g>
+            )}
           </svg>
 
           {/* 图例 */}
@@ -136,6 +179,12 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions }) => 
                 <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                 <span>情绪点</span>
               </div>
+              {currentVAD && (
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span>当前状态</span>
+                </div>
+              )}
             </div>
             <div className="text-xs text-gray-500 mt-1">
               X轴：Valence（负-正）| Y轴：Dominance（被动-主动）

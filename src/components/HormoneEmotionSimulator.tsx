@@ -248,7 +248,10 @@ const HormoneEmotionSimulator = () => {
       </div>
       {/* 情绪分布图 */}
       <div className="mb-6">
-        <EmotionCircleChart emotions={emotionVADData} />
+        <EmotionCircleChart 
+          emotions={emotionVADData} 
+          currentVAD={currentVAD}
+        />
       </div>
       </div>
     </div>
