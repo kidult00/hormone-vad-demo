@@ -51,8 +51,15 @@ export const VADHistoryChart: React.FC<VADHistoryChartProps> = ({
                 backgroundColor: 'rgba(255, 255, 255, 0.95)', 
                 border: '1px solid #e5e7eb',
                 borderRadius: '8px',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                fontSize: 12,
+                padding: '16px',
+                zIndex: 1000
               }}
+              formatter={(value: number, name: string) => [
+                value.toFixed(1),
+                name
+              ]}
             />
             <Legend 
               wrapperStyle={{ paddingTop: '10px' }}
