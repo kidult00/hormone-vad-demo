@@ -40,34 +40,82 @@ export const calculateVAD = (hormones: Hormones): VAD => {
 
 /**
  * 根据VAD值判断情绪状态
- * 基于Russell的环形情绪模型和VAD三维理论
- * @param vad - VAD因子
- * @returns 情绪状态描述
+ * 基于emotion_vad.json数据集的VAD分布特征
+ * 将0-100的VAD值映射到-1到1区间后进行判断
+ * @param vad - VAD因子（0-100范围）
+ * @returns 最匹配的情绪状态
  */
 export const getEmotionState = (vad: VAD): string => {
-  const { arousal, valence, dominance } = vad;
+  // 将0-100映射到-1到1区间，与emotion_vad.json数据一致
+  const normalizedVad = {
+    valence: (vad.valence - 50) / 50,  // 0-100 -> -1-1
+    dominance: (vad.dominance - 50) / 50,  // 0-100 -> -1-1
+    arousal: vad.arousal / 100  // 0-100 -> 0-1（arousal只取正值）
+  };
+
+  const { valence, dominance, arousal } = normalizedVad;
+
+  // 基于emotion_vad.json数据的精确区间判断
   
-  // 高唤醒高valence高dominance -> 兴奋
-  if (valence > 70 && arousal > 70 && dominance > 60) return "兴奋";
-  
-  // 低唤醒高valence中dominance -> 满足
-  if (valence > 70 && arousal < 40 && dominance > 50) return "满足";
-  
-  // 高唤醒低valence低dominance -> 焦虑
-  if (valence < 30 && arousal > 70 && dominance < 40) return "焦虑";
-  
-  // 低唤醒低valence低dominance -> 抑郁
-  if (valence < 30 && arousal < 40 && dominance < 40) return "抑郁";
-  
-  // 中唤醒高valence低dominance -> 愉悦
-  if (valence > 60 && arousal > 60 && dominance < 40) return "愉悦";
-  
-  // 高唤醒低valence高dominance -> 愤怒
-  if (valence < 40 && arousal > 60 && dominance > 60) return "愤怒";
-  
-  // 低唤醒中valence低dominance -> 平静
-  if (valence > 50 && arousal < 50 && dominance < 50) return "平静";
-  
+  // 高唤醒高valence区域
+  if (arousal > 0.8 && valence > 0.7) {
+    if (dominance > 0.7) return "爱";
+    if (dominance > 0.5) return "幸福";
+    return "欣喜";
+  }
+
+  // 高唤醒中valence区域
+  if (arousal > 0.7 && valence > 0.3) {
+    if (dominance > 0.8) return "期待";
+    if (dominance > 0.5) return "喜欢";
+    if (dominance > 0.2) return "愉快";
+    return "解脱";
+  }
+
+  // 中唤醒高valence区域
+  if (arousal > 0.5 && valence > 0.5) {
+    if (dominance > 0.6) return "骄傲";
+    if (dominance > 0.3) return "好奇";
+    return "羡";
+  }
+
+  // 高唤醒低valence区域
+  if (arousal > 0.7 && valence < -0.3) {
+    if (dominance > 0.6) return "恨";
+    if (dominance > 0.3) return "怒";
+    if (dominance > 0) return "恐惧";
+    return "焦虑";
+  }
+
+  // 中唤醒低valence区域
+  if (arousal > 0.4 && valence < -0.4) {
+    if (dominance > 0.5) return "失落";
+    if (dominance > 0.2) return "讨厌";
+    if (dominance > 0) return "悲伤";
+    return "厌恶";
+  }
+
+  // 低唤醒低valence区域
+  if (arousal < 0.5 && valence < -0.5) {
+    if (dominance > 0.1) return "嫉";
+    return "抑郁";
+  }
+
+  // 低唤醒中valence区域
+  if (arousal < 0.5 && Math.abs(valence) < 0.3) {
+    if (dominance > 0.6) return "敬畏";
+    if (dominance > 0.3) return "相信";
+    if (dominance > 0) return "关心";
+    return "平静/孤独/空虚";
+  }
+
+  // 中唤醒中valence区域
+  if (arousal > 0.4 && Math.abs(valence) < 0.4) {
+    if (dominance > 0.4) return "困惑";
+    return "复杂";
+  }
+
+  // 默认返回复杂情绪
   return "复杂";
 };
 

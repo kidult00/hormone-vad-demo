@@ -202,57 +202,64 @@ const HormoneEmotionSimulator = () => {
           </CardContent>
         </Card>
 
-        {/* 当前状态和VAD因子 - 合并为一个卡片 */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">当前状态与VAD因子</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* 左侧：当前状态 (1/3) */}
-              <div className="lg:col-span-1 space-y-4">
-                <div className="text-3xl font-bold text-blue-600">{currentEmotion}</div>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                    <span className="font-medium">Arousal:</span>
-                    <span className="font-semibold text-red-600">{currentVAD.arousal.toFixed(1)}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                    <span className="font-medium">Valence:</span>
-                    <span className="font-semibold text-green-600">{currentVAD.valence.toFixed(1)}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                    <span className="font-medium">Dominance:</span>
-                    <span className="font-semibold text-blue-600">{currentVAD.dominance.toFixed(1)}</span>
+        {/* 当前状态、VAD因子和情绪分布图 - 合并为一行 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* 左侧：当前状态与VAD因子卡片 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">当前状态与VAD因子</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div>
+                {/* 当前状态 */}
+                <div className="mb-6">
+                  <div className="text-3xl font-bold text-blue-600 mb-4">{currentEmotion}</div>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                      <span className="font-medium">Arousal:</span>
+                      <span className="font-semibold text-red-600">{currentVAD.arousal.toFixed(1)}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                      <span className="font-medium">Valence:</span>
+                      <span className="font-semibold text-green-600">{currentVAD.valence.toFixed(1)}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                      <span className="font-medium">Dominance:</span>
+                      <span className="font-semibold text-blue-600">{currentVAD.dominance.toFixed(1)}</span>
+                    </div>
                   </div>
                 </div>
+
+                {/* VAD因子雷达图 */}
+                <div>
+                  <VADRadarChart vad={currentVAD} />
+                </div>
               </div>
+            </CardContent>
+          </Card>
 
-              {/* 右侧：VAD因子雷达图 (2/3) */}
-              <div className="lg:col-span-2">
-                <VADRadarChart vad={currentVAD} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          {/* 右侧：情绪分布图卡片 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">情绪分布图</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EmotionCircleChart 
+                emotions={emotionVADData} 
+                currentVAD={currentVAD}
+              />
+            </CardContent>
+          </Card>
+        </div>
 
-      
-
-      {/* 历史图表 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* VAD历史 */}
-        <VADHistoryChart data={history} />
-        
-        {/* 激素历史 */}
-        <HormoneHistoryChart data={history} language={language} />
-      </div>
-      {/* 情绪分布图 */}
-      <div className="mb-6">
-        <EmotionCircleChart 
-          emotions={emotionVADData} 
-          currentVAD={currentVAD}
-        />
-      </div>
+        {/* 历史图表 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* VAD历史 */}
+          <VADHistoryChart data={history} />
+          
+          {/* 激素历史 */}
+          <HormoneHistoryChart data={history} language={language} />
+        </div>
       </div>
     </div>
   );

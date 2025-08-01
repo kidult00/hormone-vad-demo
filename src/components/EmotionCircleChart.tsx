@@ -66,11 +66,6 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions, curre
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">情绪分布图</CardTitle>
-      </CardHeader>
-      <CardContent>
         <div className="flex flex-col items-center">
           <svg width={width} height={height} className="border rounded-lg bg-gray-50">
             {/* 背景网格 */}
@@ -174,7 +169,7 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions, curre
 
           {/* 图例 */}
           <div className="mt-4 text-sm text-gray-600">
-            <div className="flex items-center justify-center space-x-4">
+            {/* <div className="flex items-center justify-center space-x-4">
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                 <span>情绪点</span>
@@ -185,14 +180,12 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions, curre
                   <span>当前状态</span>
                 </div>
               )}
-            </div>
+            </div> */}
             <div className="text-xs text-gray-500 mt-1">
               X轴：Valence（负-正）| Y轴：Dominance（被动-主动）
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
   );
 };
 
