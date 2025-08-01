@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -18,7 +19,11 @@ interface EmotionVAD {
   arousal: number;
 }
 
-const HormoneEmotionSimulator = () => {
+interface HormoneEmotionSimulatorProps {
+  setCurrentVAD: (vad: { valence: number; arousal: number; dominance: number }) => void;
+}
+
+const HormoneEmotionSimulator = ({ setCurrentVAD }: HormoneEmotionSimulatorProps) => {
   const [emotionVADData, setEmotionVADData] = useState<EmotionVAD[]>([]);
 
   // 动态加载JSON数据
@@ -88,6 +93,9 @@ const HormoneEmotionSimulator = () => {
 
   // 添加语言状态
   const [language, setLanguage] = useState<Language>('zh');
+  
+  // 获取导航函数
+  const navigate = useNavigate();
 
   // 翻译函数
   const t = (hormoneKey: keyof typeof HORMONE_TRANSLATIONS) => {
@@ -242,6 +250,17 @@ const HormoneEmotionSimulator = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-semibold">情绪分布图</CardTitle>
+              <div className="absolute top-4 right-4">
+                <Button 
+                  onClick={() => {
+                    setCurrentVAD(currentVAD);
+                    navigate('/3d');
+                  }}
+                  className="text-xs px-3 py-1 h-auto cursor-pointer"
+                >
+                  3D视图
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <EmotionCircleChart 
