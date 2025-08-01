@@ -106,7 +106,7 @@ const HormoneEmotionSimulator = () => {
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">激素-情绪调节模拟器</h1>
           <p className="text-muted-foreground">
-            基于VAD情感模型，模拟不同激素对情绪的影响
+            基于VAD情感模型，模拟不同激素对情绪的影响 by 00@HCI
           </p>
         </div>
         <Card className="mb-6">
