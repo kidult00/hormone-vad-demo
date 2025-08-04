@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -19,11 +18,7 @@ interface EmotionVAD {
   arousal: number;
 }
 
-interface HormoneEmotionSimulatorProps {
-  setCurrentVAD: (vad: { valence: number; arousal: number; dominance: number }) => void;
-}
-
-const HormoneEmotionSimulator = ({ setCurrentVAD }: HormoneEmotionSimulatorProps) => {
+const HormoneEmotionSimulator = () => {
   const [emotionVADData, setEmotionVADData] = useState<EmotionVAD[]>([]);
 
   // 动态加载JSON数据
@@ -93,9 +88,6 @@ const HormoneEmotionSimulator = ({ setCurrentVAD }: HormoneEmotionSimulatorProps
 
   // 添加语言状态
   const [language, setLanguage] = useState<Language>('zh');
-  
-  // 获取导航函数
-  const navigate = useNavigate();
 
   // 翻译函数
   const t = (hormoneKey: keyof typeof HORMONE_TRANSLATIONS) => {
@@ -114,7 +106,7 @@ const HormoneEmotionSimulator = ({ setCurrentVAD }: HormoneEmotionSimulatorProps
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">激素-情绪调节模拟器</h1>
           <p className="text-muted-foreground">
-            基于VAD情感模型，模拟不同激素对情绪的影响 by 00@HCI
+            基于VAD情感模型，模拟不同激素对情绪的影响 @HCI
           </p>
         </div>
         <Card className="mb-6">
@@ -125,7 +117,7 @@ const HormoneEmotionSimulator = ({ setCurrentVAD }: HormoneEmotionSimulatorProps
               <div>
               <h3 className="font-semibold text-lg mb-2">激素参数设置与注入</h3>
               <p className='text-sm text-gray-500 mb-4'>
-                Force: 注入时的剂量  |  Decay: 衰减时长 |  Current: 当前激素水平
+                Force: 注入时的剂量  |  Decay: 衰减系数 |  Current: 当前激素水平
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
                 {HORMONE_KEYS.map(hormone => {
@@ -250,17 +242,6 @@ const HormoneEmotionSimulator = ({ setCurrentVAD }: HormoneEmotionSimulatorProps
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-semibold">情绪分布图</CardTitle>
-              <div className="absolute top-4 right-4">
-                <Button 
-                  onClick={() => {
-                    setCurrentVAD(currentVAD);
-                    navigate('/3d');
-                  }}
-                  className="text-xs px-3 py-1 h-auto cursor-pointer"
-                >
-                  3D视图
-                </Button>
-              </div>
             </CardHeader>
             <CardContent>
               <EmotionCircleChart 
