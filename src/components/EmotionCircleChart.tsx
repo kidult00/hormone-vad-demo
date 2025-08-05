@@ -148,7 +148,7 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions, curre
                   cx={mapToSVG(currentVAD.valence, currentVAD.dominance, false).x}
                   cy={mapToSVG(currentVAD.valence, currentVAD.dominance, false).y}
                   r={dotRadius + 2}
-                  fill="#ef4444"
+                  fill="#FA7317"
                   stroke="#dc2626"
                   strokeWidth="1"
                 />
@@ -157,7 +157,7 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions, curre
                   y={mapToSVG(currentVAD.valence, currentVAD.dominance, false).y - dotRadius - 10}
                   textAnchor="middle"
                   fontSize="10"
-                  fill="#dc2626"
+                  fill="#FA7317"
                   fontWeight="bold"
                 >
                   当前状态

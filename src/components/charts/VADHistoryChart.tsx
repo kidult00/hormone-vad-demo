@@ -67,7 +67,7 @@ export const VADHistoryChart: React.FC<VADHistoryChartProps> = ({
               iconType="line"
             />
             <Line 
-              type="monotone" 
+              type="natural" 
               dataKey="arousal" 
               stroke="#ef4444" 
               name="Arousal" 
@@ -78,7 +78,7 @@ export const VADHistoryChart: React.FC<VADHistoryChartProps> = ({
               isAnimationActive={false}  // 完全禁用动画
             />
             <Line 
-              type="monotone" 
+              type="natural" 
               dataKey="valence" 
               stroke="#22c55e" 
               name="Valence" 
@@ -89,7 +89,7 @@ export const VADHistoryChart: React.FC<VADHistoryChartProps> = ({
               isAnimationActive={false}  // 完全禁用动画
             />
             <Line 
-              type="monotone" 
+              type="natural" 
               dataKey="dominance" 
               stroke="#3b82f6" 
               name="Dominance" 
