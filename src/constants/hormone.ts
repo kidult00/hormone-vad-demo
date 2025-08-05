@@ -23,11 +23,11 @@ export const hormoneColors: Record<string, string> = {
 };
 
 export const initialHormones = {
-  adrenaline: { current: 20, force: 15, decay: 0.98 },
-  cortisol: { current: 30, force: 20, decay: 0.99 },
-  gaba: { current: 40, force: 25, decay: 0.97 },
-  dopamine: { current: 35, force: 18, decay: 0.985 },
-  serotonin: { current: 45, force: 12, decay: 0.99 },
-  testosterone: { current: 25, force: 22, decay: 0.975 },
-  oxytocin: { current: 30, force: 16, decay: 0.98 }
+  adrenaline: { current: 25, force: 15, decay: 0.98 },
+  cortisol: { current: 35, force: 20, decay: 0.99 },
+  gaba: { current: 45, force: 25, decay: 0.97 },
+  dopamine: { current: 40, force: 18, decay: 0.985 },
+  serotonin: { current: 50, force: 12, decay: 0.99 },
+  testosterone: { current: 30, force: 22, decay: 0.975 },
+  oxytocin: { current: 35, force: 16, decay: 0.98 }
 };

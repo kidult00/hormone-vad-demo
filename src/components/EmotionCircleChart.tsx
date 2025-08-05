@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 interface EmotionVAD {
   emotion: string;
@@ -21,7 +20,7 @@ interface EmotionCircleChartProps {
  * 二维情绪分布图组件
  * 将情绪数据映射到二维坐标系中
  * X轴：Valence（负-正）
- * Y轴：Dominance（被动-主动）
+ * Y轴：Dominance（主动-被动）
  * 显示当前VAD状态为红色圆点
  */
 const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions, currentVAD }) => {
@@ -61,8 +60,8 @@ const EmotionCircleChart: React.FC<EmotionCircleChartProps> = ({ emotions, curre
   const axisLabels = [
     { text: '负', x: centerX - radius - 20, y: centerY },
     { text: '正', x: centerX + radius + 20, y: centerY },
-    { text: '被动', x: centerX, y: centerY + radius + 20 },
-    { text: '主动', x: centerX, y: centerY - radius - 20 }
+    { text: '主动', x: centerX, y: centerY + radius + 20 },
+    { text: '被动', x: centerX, y: centerY - radius - 20 }
   ];
 
   return (

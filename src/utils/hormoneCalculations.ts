@@ -1,4 +1,36 @@
-import type { Hormones, VAD } from '@/types/hormone';
+import type { VAD, Hormones } from '@/types/hormone';
+
+// 情绪数据类型定义
+interface EmotionData {
+  emotion: string;
+  valence: number;
+  dominance: number;
+  arousal: number;
+}
+
+// 从emotion_vad.json动态导入情绪数据库
+import emotionData from '../../data/emotion_vad.json';
+
+// 使用导入的数据
+const EMOTION_DATABASE: EmotionData[] = emotionData;
+
+/**
+ * VAD维度权重配置（基于数据标准差）
+ */
+const VAD_WEIGHTS = {
+  valence: 0.4,    // 效价权重最高，区分正负情绪
+  dominance: 0.35, // 支配力权重中等
+  arousal: 0.25    // 唤醒度权重较低
+};
+
+/**
+ * KNN算法参数
+ */
+const KNN_CONFIG = {
+  k: 3,              // 近邻数量
+  maxDistance: 0.8,  // 最大距离阈值
+  confidenceThreshold: 0.6  // 置信度阈值
+};
 
 /**
  * 激素计算工具库
@@ -39,85 +71,131 @@ export const calculateVAD = (hormones: Hormones): VAD => {
 };
 
 /**
+ * 计算加权欧氏距离
+ * @param target - 目标VAD值
+ * @param source - 源情绪数据
+ * @returns 加权距离
+ */
+const calculateWeightedDistance = (
+  target: { valence: number; dominance: number; arousal: number },
+  source: { valence: number; dominance: number; arousal: number }
+): number => {
+  const valenceDiff = (target.valence - source.valence) * VAD_WEIGHTS.valence;
+  const dominanceDiff = (target.dominance - source.dominance) * VAD_WEIGHTS.dominance;
+  const arousalDiff = (target.arousal - source.arousal) * VAD_WEIGHTS.arousal;
+  
+  return Math.sqrt(valenceDiff ** 2 + dominanceDiff ** 2 + arousalDiff ** 2);
+};
+
+/**
  * 根据VAD值判断情绪状态
- * 基于emotion_vad.json数据集的VAD分布特征
- * 将0-100的VAD值映射到-1到1区间后进行判断
+ * 使用改进的K-近邻算法(KNN)进行情绪识别
+ * 包含置信度计算和异常值处理
  * @param vad - VAD因子（0-100范围）
  * @returns 最匹配的情绪状态
  */
 export const getEmotionState = (vad: VAD): string => {
   // 将0-100映射到-1到1区间，与emotion_vad.json数据一致
   const normalizedVad = {
-    valence: (vad.valence - 50) / 50,  // 0-100 -> -1-1
-    dominance: (vad.dominance - 50) / 50,  // 0-100 -> -1-1
-    arousal: vad.arousal / 100  // 0-100 -> 0-1（arousal只取正值）
+    valence: (vad.valence - 50) / 50,
+    dominance: (vad.dominance - 50) / 50,
+    arousal: vad.arousal / 100
   };
 
-  const { valence, dominance, arousal } = normalizedVad;
+  // 计算与所有情绪的距离
+  const distances = EMOTION_DATABASE.map(emotion => ({
+    distance: calculateWeightedDistance(normalizedVad, emotion),
+    ...emotion
+  }));
 
-  // 基于emotion_vad.json数据的精确区间判断
-  
-  // 高唤醒高valence区域
-  if (arousal > 0.8 && valence > 0.7) {
-    if (dominance > 0.7) return "爱";
-    if (dominance > 0.5) return "幸福";
-    return "欣喜";
-  }
+  // 按距离排序并获取最近的K个
+  const kNearest = distances
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, KNN_CONFIG.k);
 
-  // 高唤醒中valence区域
-  if (arousal > 0.7 && valence > 0.3) {
-    if (dominance > 0.8) return "期待";
-    if (dominance > 0.5) return "喜欢";
-    if (dominance > 0.2) return "愉快";
-    return "解脱";
-  }
-
-  // 中唤醒高valence区域
-  if (arousal > 0.5 && valence > 0.5) {
-    if (dominance > 0.6) return "骄傲";
-    if (dominance > 0.3) return "好奇";
-    return "羡";
-  }
-
-  // 高唤醒低valence区域
-  if (arousal > 0.7 && valence < -0.3) {
-    if (dominance > 0.6) return "恨";
-    if (dominance > 0.3) return "怒";
-    if (dominance > 0) return "恐惧";
-    return "焦虑";
-  }
-
-  // 中唤醒低valence区域
-  if (arousal > 0.4 && valence < -0.4) {
-    if (dominance > 0.5) return "失落";
-    if (dominance > 0.2) return "讨厌";
-    if (dominance > 0) return "悲伤";
-    return "厌恶";
-  }
-
-  // 低唤醒低valence区域
-  if (arousal < 0.5 && valence < -0.5) {
-    if (dominance > 0.1) return "嫉";
-    return "抑郁";
-  }
-
-  // 低唤醒中valence区域
-  if (arousal < 0.5 && Math.abs(valence) < 0.3) {
-    if (dominance > 0.6) return "敬畏";
-    if (dominance > 0.3) return "相信";
-    if (dominance > 0) return "关心";
+  // 异常值检测：如果最近的距离过大，返回中性情绪
+  const minDistance = kNearest[0]?.distance ?? Infinity;
+  if (minDistance > KNN_CONFIG.maxDistance) {
     return "平静/孤独/空虚";
   }
 
-  // 中唤醒中valence区域
-  if (arousal > 0.4 && Math.abs(valence) < 0.4) {
-    if (dominance > 0.4) return "困惑";
-    return "复杂";
+  // 使用加权投票决定最终情绪
+  const totalWeight = kNearest.reduce((sum, item) => sum + 1 / (item.distance + 0.1), 0);
+  const weightedEmotions = kNearest.map(item => ({
+    emotion: item.emotion,
+    weight: (1 / (item.distance + 0.1)) / totalWeight
+  }));
+
+  // 返回权重最大的情绪
+  const finalEmotion = weightedEmotions.reduce((max, current) => 
+    current.weight > max.weight ? current : max
+  );
+
+  return finalEmotion.emotion;
+};
+
+/**
+ * 获取情绪识别详情（包含置信度）
+ * @param vad - VAD因子（0-100范围）
+ * @returns 情绪识别结果和置信度
+ */
+export const getEmotionStateWithConfidence = (vad: VAD): {
+  emotion: string;
+  confidence: number;
+  alternatives: Array<{ emotion: string; confidence: number }>;
+} => {
+  const normalizedVad = {
+    valence: (vad.valence - 50) / 50,
+    dominance: (vad.dominance - 50) / 50,
+    arousal: vad.arousal / 100
+  };
+
+  const distances = EMOTION_DATABASE.map(emotion => ({
+    distance: calculateWeightedDistance(normalizedVad, emotion),
+    ...emotion
+  }));
+
+  const kNearest = distances
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, KNN_CONFIG.k);
+
+  // 计算置信度
+  const minDistance = kNearest[0]?.distance ?? Infinity;
+  const maxConfidence = 0.9;
+  const minConfidence = 0.3;
+  
+  let confidence = Math.max(
+    0,
+    maxConfidence - (minDistance / KNN_CONFIG.maxDistance) * (maxConfidence - minConfidence)
+  );
+
+  // 异常值处理
+  if (minDistance > KNN_CONFIG.maxDistance) {
+    return {
+      emotion: "平静/孤独/空虚",
+      confidence: 1.0,
+      alternatives: []
+    };
   }
 
-  // 默认返回复杂情绪
-  return "复杂";
-};
+  // 计算加权结果
+  const totalWeight = kNearest.reduce((sum, item) => sum + 1 / (item.distance + 0.1), 0);
+  const weightedEmotions = kNearest.map(item => ({
+    emotion: item.emotion,
+    confidence: (1 / (item.distance + 0.1)) / totalWeight
+  }));
+
+  const finalEmotion = weightedEmotions[0];
+
+  return {
+    emotion: finalEmotion.emotion,
+    confidence: Math.min(confidence, finalEmotion.confidence),
+    alternatives: weightedEmotions.slice(1, 3).map(item => ({
+      emotion: item.emotion,
+      confidence: Math.min(confidence * 0.8, item.confidence)
+    }))
+  };
+}
 
 /**
  * 数值边界检查工具函数
