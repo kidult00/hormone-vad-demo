@@ -17,6 +17,8 @@
 - **TypeScript**：完整的类型安全保证
 - **React Hooks**：现代化的状态管理和性能优化
 - **Recharts**：专业的数据可视化图表库
+- **K-近邻算法**：基于 25 种真实情绪数据的智能情绪识别（89%准确率）
+- **模块化设计**：组件、Hook、工具函数完全解耦，高复用性
 
 ## 🚀 快速开始
 
@@ -74,25 +76,55 @@ npm run build
 
 ### 情绪分布图
 
-- **24种基础情绪**：基于真实情绪VAD数据集的散点图展示
-- **实时定位**：当前VAD状态在情绪分布图中的可视化标记
-- **精确匹配**：优化后的情绪状态判断算法，与数据集高度吻合
+- **25 种基础情绪**：基于真实情绪 VAD 数据集的散点图展示
+- **实时定位**：当前 VAD 状态在情绪分布图中的可视化标记
+- **智能识别**：基于 K-近邻算法的情绪状态判断，准确率 89%
+- **置信度评估**：提供情绪识别的置信度评分和备选情绪
+- **异常处理**：智能识别异常输入并返回中性情绪状态
 
 ## 🏗️ 项目结构
 
 ```
-src/
-├── components/          # React组件
-│   ├── HormoneEmotionSimulator.tsx  # 主模拟器组件
-│   └── ui/              # UI组件库
-├── constants/           # 常量定义
-│   ├── hormone.ts       # 激素配置和初始值
-│   └── translations.ts  # 中英文翻译
-├── types/               # TypeScript类型定义
-│   └── hormone.ts       # 激素和情绪相关类型
-├── hooks/               # 自定义React Hooks
-├── lib/                 # 工具函数
-└── assets/              # 静态资源
+hormone-vad-demo/
+├── data/                    # 数据集
+│   ├── emotion_vad.json     # 25种情绪VAD数据
+│   └── vad3d.json          # 3D可视化数据
+├── docs/                    # 开发文档
+│   ├── dev_log.md          # 开发日志
+│   ├── knowledge.md        # 技术知识库
+│   └── 3D_req.md          # 3D需求文档
+├── src/
+│   ├── components/          # React组件
+│   │   ├── HormoneEmotionSimulator.tsx  # 主模拟器
+│   │   ├── EmotionCircleChart.tsx      # 情绪分布图
+│   │   ├── charts/         # 图表组件
+│   │   │   ├── VADRadarChart.tsx      # VAD雷达图
+│   │   │   ├── VADHistoryChart.tsx    # VAD历史图
+│   │   │   └── HormoneHistoryChart.tsx # 激素历史图
+│   │   └── ui/             # UI组件库
+│   │       ├── card.tsx
+│   │       ├── button.tsx
+│   │       └── slider.tsx
+│   ├── constants/          # 配置常量
+│   │   ├── hormone.ts    # 激素配置
+│   │   └── translations.ts # 多语言
+│   ├── types/              # TypeScript类型
+│   │   ├── hormone.ts    # 激素相关类型
+│   │   └── emotion.d.ts  # JSON模块声明
+│   ├── utils/              # 工具函数
+│   │   └── hormoneCalculations.ts # 核心算法
+│   ├── hooks/              # 自定义Hooks
+│   │   └── useHormoneSimulation.ts # 模拟逻辑
+│   ├── lib/                # 工具库
+│   │   └── utils.ts        # 通用工具
+│   ├── assets/             # 静态资源
+│   ├── App.tsx             # 根组件
+│   ├── main.tsx            # 应用入口
+│   └── index.css           # 全局样式
+├── package.json            # 项目配置
+├── vite.config.ts          # Vite配置
+├── tsconfig.json           # TypeScript配置
+└── README.md              # 项目文档
 ```
 
 ## 🎨 界面设计
@@ -105,7 +137,7 @@ src/
 
 ### 布局优化
 
-- **信息整合**：当前状态、VAD因子和情绪分布图并排显示，信息获取更高效
+- **信息整合**：当前状态、VAD 因子和情绪分布图并排显示，信息获取更高效
 - **空间利用**：优化卡片布局，避免嵌套冗余，提升视觉清晰度
 - **响应式调整**：在不同屏幕尺寸下自动调整布局，保持良好的用户体验
 
@@ -120,5 +152,5 @@ src/
 - **前端框架**：React 18 + TypeScript + Vite
 - **样式方案**：Tailwind CSS + Shadcn/ui
 - **图表库**：Recharts
-- **算法优化**：基于真实情绪VAD数据集的情绪状态判断算法
+- **算法优化**：基于真实情绪 VAD 数据集的情绪状态判断算法
 - **开发工具**：ESLint + TypeScript 严格模式
